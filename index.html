@@ -7,131 +7,72 @@
 
   <style>
     :root{
-      --bg1:#0b1020; --bg2:#1a0f1f;
-      --card: rgba(255,255,255,.08);
-      --border: rgba(255,255,255,.14);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.7);
-      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      /* Gallery wall (light pink) */
+      --wall1:#ffd6e7;
+      --wall2:#ffe6f0;
+
+      --ink:#3b1a2b;
+      --shadow: 0 18px 50px rgba(0,0,0,.20);
+      --softShadow: 0 10px 30px rgba(0,0,0,.14);
       --radius: 22px;
+
+      /* Frames */
+      --frameGold1:#c8a34a;
+      --frameGold2:#f6e3a6;
+      --mat:#fbf6ef;
     }
+
     *{ box-sizing:border-box; }
     body{
-      margin:0; min-height:100vh;
+      margin:0;
+      min-height:100vh;
+      color:var(--ink);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
       background:
-        radial-gradient(1200px 800px at 20% 10%, #2d1b3a 0%, transparent 55%),
-        radial-gradient(900px 700px at 80% 30%, #14305f 0%, transparent 55%),
-        linear-gradient(135deg, var(--bg1), var(--bg2));
-      display:grid;
-      place-items:center;
-      padding:22px;
+        radial-gradient(1200px 700px at 15% 15%, rgba(255,255,255,.55), transparent 60%),
+        radial-gradient(900px 650px at 85% 25%, rgba(255,255,255,.45), transparent 60%),
+        linear-gradient(135deg, var(--wall1), var(--wall2));
       overflow-x:hidden;
     }
 
-    .wrap{
-      width:min(980px, 100%);
+    /* subtle wall texture */
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(0,0,0,.015) 0px,
+          rgba(0,0,0,.015) 1px,
+          rgba(255,255,255,0) 5px
+        );
+      mix-blend-mode:multiply;
+      opacity:.45;
+    }
+
+    .container{
+      width:min(1100px, 92vw);
+      margin: 28px auto 60px;
       display:grid;
-      gap:16px;
-      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
       opacity: 0;
       transform: translateY(8px);
       transition: opacity 700ms ease, transform 900ms ease;
     }
-    .wrap.revealed{
+    .container.revealed{
       opacity: 1;
       transform: translateY(0);
     }
-    @media (max-width: 900px){
-      .wrap{ grid-template-columns:1fr; }
-    }
 
     .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
+      background: rgba(255,255,255,.55);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--softShadow);
+      backdrop-filter: blur(4px);
       overflow:hidden;
-      backdrop-filter: blur(10px);
     }
-
-    /* Gallery */
-    .gallery{ position:relative; aspect-ratio:16/10; min-height:320px; }
-    .gallery img{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      object-fit:cover;
-      opacity:0;
-      transform:scale(1.02);
-      transition: opacity 700ms ease, transform 900ms ease;
-    }
-    .gallery img.active{ opacity:1; transform:scale(1); }
-
-    .overlay{
-      position:absolute; inset:auto 0 0 0;
-      padding:18px 18px 16px;
-      background: linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,0));
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:14px;
-    }
-    .caption{ display:grid; gap:4px; }
-    .title{ font-weight:700; font-size:18px; text-shadow:0 10px 30px rgba(0,0,0,.6); }
-    .sub{ color:var(--muted); font-size:13px; }
-
-    .controls{ display:flex; gap:10px; align-items:center; }
-    button{
-      appearance:none;
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.10);
-      color: var(--text);
-      border-radius: 14px;
-      padding: 10px 12px;
-      cursor:pointer;
-      transition: transform 120ms ease, background 200ms ease;
-      user-select:none;
-      font-weight:600;
-    }
-    button:hover{ background: rgba(255,255,255,.16); }
-    button:active{ transform:scale(.98); }
-
-    .dotbar{ display:flex; gap:6px; align-items:center; }
-    .dot{
-      width:8px; height:8px; border-radius:999px;
-      background: rgba(255,255,255,.35);
-      transition: transform 200ms ease, background 200ms ease;
-    }
-    .dot.active{ background: rgba(255,255,255,.85); transform:scale(1.2); }
-
-    /* Side */
-    .side{ padding:18px; display:grid; gap:14px; align-content:start; }
-    h1{ margin:0; font-size:22px; }
-    p{ margin:0; line-height:1.5; color:var(--muted); font-size:14px; white-space: pre-wrap; }
-
-    .note{
-      padding:14px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      min-height: 92px;
-    }
-    .small{ font-size:12px; color: rgba(255,255,255,.6); }
-    .heart{ font-size:20px; filter: drop-shadow(0 8px 20px rgba(0,0,0,.5)); }
-
-    /* Typewriter caret */
-    .caret::after{
-      content:"";
-      display:inline-block;
-      width: 10px;
-      height: 1.15em;
-      margin-left: 4px;
-      border-right: 2px solid rgba(255,255,255,.75);
-      transform: translateY(2px);
-      animation: blink 0.9s steps(1) infinite;
-    }
-    @keyframes blink { 50% { opacity: 0; } }
 
     /* ===== Curtain Reveal ===== */
     .curtain{
@@ -215,6 +156,8 @@
       background: rgba(0,0,0,.35);
       box-shadow: 0 30px 80px rgba(0,0,0,.5);
       width: min(520px, calc(100% - 44px));
+      color: rgba(255,255,255,.92);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
     .curtain-ui .big{
       font-weight: 800;
@@ -256,6 +199,194 @@
       transition: opacity 500ms ease, transform 700ms ease;
     }
 
+    .heart{ font-size:20px; }
+    .small{ font-size:12px; color: rgba(0,0,0,.55); }
+
+    /* ===== Top row ===== */
+    .topRow{
+      display:grid;
+      gap:16px;
+      grid-template-columns: 1fr;
+    }
+
+    /* ===== Gallery frames grid ===== */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      padding: 18px;
+    }
+    @media (max-width: 980px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px){ .grid{ grid-template-columns: 1fr; } }
+
+    .frame{
+      border-radius: 18px;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--frameGold1), var(--frameGold2));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.14);
+      cursor:pointer;
+      transition: transform 180ms ease, box-shadow 250ms ease;
+      position:relative;
+    }
+    .frame:hover{ transform: translateY(-2px); box-shadow: 0 22px 70px rgba(0,0,0,.22); }
+    .frame::before{
+      content:"";
+      position:absolute; inset: 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.15);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+      pointer-events:none;
+    }
+
+    .mat{
+      background: var(--mat);
+      border-radius: 14px;
+      padding: 10px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+
+    .art{
+      width:100%;
+      aspect-ratio: 4 / 5;
+      border-radius: 10px;
+      overflow:hidden;
+      background: rgba(0,0,0,.05);
+      display:grid;
+      place-items:center;
+    }
+    .art img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    .labelCard{
+      margin-top:10px;
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 12px;
+      opacity: .95;
+      box-shadow: 0 10px 24px rgba(0,0,0,.10);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+
+    /* ===== Message + Music panel ===== */
+    .side{
+      padding:18px;
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+    h1{ margin:0; font-size:22px; font-weight:800; }
+    p{ margin:0; line-height:1.55; color: rgba(0,0,0,.70); font-size:14px; white-space: pre-wrap; }
+
+    .note{
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.55);
+      min-height: 92px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.75);
+    }
+
+    /* Typewriter caret */
+    .caret::after{
+      content:"";
+      display:inline-block;
+      width: 10px;
+      height: 1.15em;
+      margin-left: 4px;
+      border-right: 2px solid rgba(59,26,43,.55);
+      transform: translateY(2px);
+      animation: blink 0.9s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    button{
+      appearance:none;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.70);
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor:pointer;
+      transition: transform 120ms ease, filter 200ms ease;
+      user-select:none;
+      font-weight:700;
+    }
+    button:hover{ filter: brightness(1.02); }
+    button:active{ transform:scale(.98); }
+
+    .nowPlaying{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    /* ===== Lightbox ===== */
+    .lightbox{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.65);
+      display:none;
+      z-index: 9998;
+      place-items:center;
+      padding: 18px;
+    }
+    .lightbox.open{ display:grid; }
+    .lbCard{
+      width: min(920px, 95vw);
+      background: rgba(255,255,255,.95);
+      border-radius: 18px;
+      box-shadow: 0 30px 90px rgba(0,0,0,.45);
+      overflow:hidden;
+      position:relative;
+    }
+    .lbImgWrap{
+      background: #111;
+      display:grid;
+      place-items:center;
+    }
+    .lbImg{
+      width:100%;
+      max-height: 78vh;
+      object-fit: contain;
+      display:block;
+      background: #111;
+    }
+    .lbTop{
+      position:absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      pointer-events:none;
+    }
+    .lbTop button{
+      pointer-events:auto;
+      background: rgba(255,255,255,.85);
+    }
+    .lbCount{
+      pointer-events:none;
+      font-weight:800;
+      font-size: 12px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.75);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+
     /* Hidden YouTube player container */
     #ytWrap{
       position: fixed;
@@ -264,13 +395,6 @@
       left: -9999px;
       top: -9999px;
       overflow: hidden;
-    }
-
-    .nowPlaying{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
     }
   </style>
 </head>
@@ -296,36 +420,31 @@
       <div class="big">I made something for you <span class="heart">💛</span></div>
       <div class="tiny">Click to open the curtain and reveal a little suprise.</div>
       <div class="tap"><span class="spark">✨</span> Click to reveal</div>
-      <div class="small" style="margin-top:10px;"> </div>
+      <div class="small" style="margin-top:10px; color:rgba(255,255,255,.7);"> </div>
     </div>
   </div>
 
-  <div class="wrap" id="wrap">
-    <!-- Gallery -->
-    <section class="card gallery" aria-label="Photo gallery">
-      <img src="images/1.jpg" class="active" alt="Photo 1">
-      <img src="images/2.jpg" alt="Photo 2">
-      <img src="images/3.jpg" alt="Photo 3">
-      <img src="images/4.jpg" alt="Photo 4">
-      <img src="images/5.jpg" alt="Photo 5">
-      <img src="images/6.jpg" alt="Photo 6">
-      <img src="images/7.jpg" alt="Photo 7">
-      <img src="images/8.jpg" alt="Photo 8">
-      <img src="images/9.jpg" alt="Photo 9">
-      <img src="images/10.jpg" alt="Photo 10">
-
-      <div class="overlay">
-        <div class="caption">
-          <div class="title">A few of my favorite photos of you <span class="heart">💛</span></div>
-          <div class="sub" id="counter">1 / 10</div>
+  <main class="container" id="wrap">
+    <!-- Title / counter card -->
+    <section class="card" style="padding:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:14px; flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:900; font-size:20px;">
+            A few of my favorite photos of you <span class="heart">💛</span>
+          </div>
+          <div class="small" id="counter" style="margin-top:6px;">1 / 10</div>
         </div>
 
-        <div class="controls">
+        <div style="display:flex; align-items:center; gap:10px;">
           <button id="prev" type="button" aria-label="Previous photo">◀</button>
-          <div class="dotbar" id="dots" aria-label="Photo dots"></div>
           <button id="next" type="button" aria-label="Next photo">▶</button>
         </div>
       </div>
+    </section>
+
+    <!-- Framed gallery grid -->
+    <section class="card">
+      <div class="grid" id="grid" aria-label="Framed photo gallery"></div>
     </section>
 
     <!-- Message + Music -->
@@ -340,41 +459,78 @@
       <div class="note">
         <div class="nowPlaying">
           <div>
-            <div style="font-weight:700;">If you can't hear the song press this</div>
-            <div class="small">you're so special to me :) </div>
+            <div style="font-weight:800;">If you can't hear the song press this</div>
+            <div class="small">you're so special to me :)</div>
           </div>
           <div style="display:flex; gap:10px;">
             <button id="ytPlay" type="button">Play</button>
             <button id="ytPause" type="button">Pause</button>
           </div>
         </div>
+
         <div class="small" style="margin-top:10px;">
-         Cuanta arte Dios ha puesto en ti que dedico 9 meses en create y una vida entera en moldearte en ser mas como El
+          Cuanta arte Dios ha puesto en ti que dedico 9 meses en create y una vida entera en moldearte en ser mas como El
         </div>
       </div>
 
-      <div class="small">
-        
+      <div class="small" style="white-space:pre-wrap;">
 “Song of Solomon 1:15: Behold, how beautiful you are, my darling, Behold, how beautiful you are!
       </div>
     </aside>
+  </main>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" aria-label="Image viewer">
+    <div class="lbCard">
+      <div class="lbTop">
+        <button id="lbClose" type="button">Close</button>
+        <div class="lbCount" id="lbCount">1 / 10</div>
+        <div style="display:flex; gap:10px;">
+          <button id="lbPrev" type="button">◀</button>
+          <button id="lbNext" type="button">▶</button>
+        </div>
+      </div>
+      <div class="lbImgWrap">
+        <img class="lbImg" id="lbImg" alt="Full image">
+      </div>
+    </div>
   </div>
 
   <script>
-    // Run only after the page is fully loaded
     window.addEventListener("load", () => {
+      // ===== SETTINGS =====
+      const IMAGE_COUNT = 10;
+
+      // Your exact message (typewriter)
+      const message = `No gallery of masters, no canvas ever hung,
+could hold a light so singular as yours.
+You are no copy, no echo of another’s hand—
+you are the deliberate stroke of God Himself,
+breathed into being with intention,
+sculpted with care so that kindness
+would live forever in the soft chambers of your heart.
+Inside and out, you carry His signature:
+that rare warmth that turns strangers into friends,
+that quiet love that makes the air around you feel like home,
+that glow that doesn’t flicker even when the world grows dim.
+You are daughter of the Most High,
+light He kindled to walk through shadows,
+a living poem of grace and strength and gentle joy.
+And I—
+I could stand before you for hours,
+not as critic, not as passerby,
+but as someone granted the privilege of beholding
+the one masterpiece He placed directly in my path.
+I know now why my eyes keep finding you:
+because heaven, in its quiet wisdom,
+decided I should never stop being astonished.`;
+
       // ===== Curtain =====
       const curtain = document.getElementById("curtain");
       const wrap = document.getElementById("wrap");
-
-      if (!curtain || !wrap) {
-        console.error("Curtain or wrap not found.");
-        return;
-      }
-
       let opened = false;
 
-      function openCurtain() {
+      function openCurtain(){
         if (opened) return;
         opened = true;
 
@@ -395,23 +551,19 @@
         setTimeout(() => curtain.classList.add("hidden"), 1100);
       }
 
-      // Make sure it reacts to clicks anywhere on the overlay
-      curtain.addEventListener("click", openCurtain, { passive: true });
-      curtain.addEventListener("pointerdown", openCurtain, { passive: true });
-      curtain.addEventListener("touchstart", openCurtain, { passive: true });
-
-      // Also allow keyboard
+      curtain.addEventListener("click", openCurtain, { passive:true });
+      curtain.addEventListener("pointerdown", openCurtain, { passive:true });
+      curtain.addEventListener("touchstart", openCurtain, { passive:true });
       curtain.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") openCurtain();
       });
 
-      // ===== YouTube setup =====
+      // ===== YouTube =====
       const YT_VIDEO_ID = "vUFsC-Pl7Js";
       window.ytPlayer = null;
       window.ytApiReady = false;
       window.shouldAutoPlayOnReady = false;
 
-      // Load YT API
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
       document.head.appendChild(tag);
@@ -446,108 +598,147 @@
       const ytPlay = document.getElementById("ytPlay");
       const ytPause = document.getElementById("ytPause");
 
-      if (ytPlay) ytPlay.addEventListener("click", () => {
+      ytPlay.addEventListener("click", () => {
         if (window.ytPlayer) {
           try { window.ytPlayer.unMute(); } catch {}
           try { window.ytPlayer.playVideo(); } catch {}
         }
       });
 
-      if (ytPause) ytPause.addEventListener("click", () => {
+      ytPause.addEventListener("click", () => {
         if (window.ytPlayer) {
           try { window.ytPlayer.pauseVideo(); } catch {}
         }
       });
 
       // ===== Typewriter =====
-      const message = `No gallery of masters, no canvas ever hung,
-could hold a light so singular as yours.
-You are no copy, no echo of another’s hand—
-you are the deliberate stroke of God Himself,
-breathed into being with intention,
-sculpted with care so that kindness
-would live forever in the soft chambers of your heart.
-Inside and out, you carry His signature:
-that rare warmth that turns strangers into friends,
-that quiet love that makes the air around you feel like home,
-that glow that doesn’t flicker even when the world grows dim.
-You are daughter of the Most High,
-light He kindled to walk through shadows,
-a living poem of grace and strength and gentle joy.
-And I—
-I could stand before you for hours,
-not as critic, not as passerby,
-but as someone granted the privilege of beholding
-the one masterpiece He placed directly in my path.
-I know now why my eyes keep finding you:
-because heaven, in its quiet wisdom,
-decided I should never stop being astonished.`;
-
+      const typeEl = document.getElementById("typeText");
       let typeIndex = 0;
       let typingStarted = false;
 
-      function typeWriter() {
-        const el = document.getElementById("typeText");
-        if (!el) return;
-
+      function typeWriter(){
+        if (!typeEl) return;
         if (typeIndex < message.length) {
-          el.textContent += message.charAt(typeIndex);
+          typeEl.textContent += message.charAt(typeIndex);
           typeIndex++;
           setTimeout(typeWriter, 22);
         } else {
-          el.classList.remove("caret");
+          typeEl.classList.remove("caret");
         }
       }
 
-      function startTyping() {
+      function startTyping(){
         if (typingStarted) return;
         typingStarted = true;
+        typeEl.textContent = "";
         setTimeout(typeWriter, 800);
       }
 
-      // ===== Gallery =====
-      const imgs = Array.from(document.querySelectorAll(".gallery img"));
+      // ===== Image helper (jpg/jpeg fallback) =====
+      function makeSrc(n, ext){ return `images/${n}.${ext}`; }
+
+      function setWithFallback(img, n){
+        img.src = makeSrc(n, "jpg");
+        img.onerror = () => {
+          if (img.src.endsWith(".jpg")) img.src = makeSrc(n, "jpeg");
+        };
+      }
+
+      // ===== Build framed gallery =====
+      const grid = document.getElementById("grid");
       const counter = document.getElementById("counter");
-      const dotsWrap = document.getElementById("dots");
 
-      let i = 0;
-      let timer = null;
+      let current = 0;
 
-      function renderDots() {
-        if (!dotsWrap) return;
-        dotsWrap.innerHTML = "";
-        imgs.forEach((_, idx) => {
-          const d = document.createElement("div");
-          d.className = "dot" + (idx === i ? " active" : "");
-          d.style.cursor = "pointer";
-          d.addEventListener("click", () => { go(idx); restartAuto(); });
-          dotsWrap.appendChild(d);
+      function updateCounter(){
+        if (counter) counter.textContent = `${current + 1} / ${IMAGE_COUNT}`;
+      }
+
+      for (let n = 1; n <= IMAGE_COUNT; n++){
+        const frame = document.createElement("div");
+        frame.className = "frame";
+        frame.setAttribute("role","button");
+        frame.setAttribute("tabindex","0");
+        frame.dataset.index = String(n-1);
+
+        const mat = document.createElement("div");
+        mat.className = "mat";
+
+        const art = document.createElement("div");
+        art.className = "art";
+
+        const img = document.createElement("img");
+        img.alt = `Photo ${n}`;
+        setWithFallback(img, n);
+
+        art.appendChild(img);
+        mat.appendChild(art);
+
+        const label = document.createElement("div");
+        label.className = "labelCard";
+        label.innerHTML = `<span><b>Photo ${n}</b></span><span class="small">tap to open</span>`;
+
+        frame.appendChild(mat);
+        frame.appendChild(label);
+
+        frame.addEventListener("click", () => openLightbox(n-1));
+        frame.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") openLightbox(n-1);
         });
+
+        grid.appendChild(frame);
       }
 
-      function go(nextIndex) {
-        if (!imgs.length) return;
-        imgs[i].classList.remove("active");
-        i = (nextIndex + imgs.length) % imgs.length;
-        imgs[i].classList.add("active");
-        if (counter) counter.textContent = `${i + 1} / ${imgs.length}`;
-        renderDots();
+      // ===== Lightbox =====
+      const lightbox = document.getElementById("lightbox");
+      const lbImg = document.getElementById("lbImg");
+      const lbCount = document.getElementById("lbCount");
+      const lbClose = document.getElementById("lbClose");
+      const lbPrev = document.getElementById("lbPrev");
+      const lbNext = document.getElementById("lbNext");
+
+      function setLightboxImage(idx){
+        current = (idx + IMAGE_COUNT) % IMAGE_COUNT;
+        const n = current + 1;
+
+        updateCounter();
+        lbCount.textContent = `${n} / ${IMAGE_COUNT}`;
+
+        lbImg.src = makeSrc(n, "jpg");
+        lbImg.onerror = () => {
+          if (lbImg.src.endsWith(".jpg")) lbImg.src = makeSrc(n, "jpeg");
+        };
       }
 
+      function openLightbox(idx){
+        setLightboxImage(idx);
+        lightbox.classList.add("open");
+      }
+      function closeLightbox(){
+        lightbox.classList.remove("open");
+      }
+
+      lbClose.addEventListener("click", closeLightbox);
+      lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
+      lbPrev.addEventListener("click", () => setLightboxImage(current - 1));
+      lbNext.addEventListener("click", () => setLightboxImage(current + 1));
+
+      window.addEventListener("keydown", (e) => {
+        if (!lightbox.classList.contains("open")) return;
+        if (e.key === "Escape") closeLightbox();
+        if (e.key === "ArrowLeft") setLightboxImage(current - 1);
+        if (e.key === "ArrowRight") setLightboxImage(current + 1);
+      });
+
+      // Top buttons (prev/next) change the “current” counter + open that photo in lightbox
       const nextBtn = document.getElementById("next");
       const prevBtn = document.getElementById("prev");
 
-      if (nextBtn) nextBtn.addEventListener("click", () => { go(i + 1); restartAuto(); });
-      if (prevBtn) prevBtn.addEventListener("click", () => { go(i - 1); restartAuto(); });
+      nextBtn.addEventListener("click", () => openLightbox(current + 1));
+      prevBtn.addEventListener("click", () => openLightbox(current - 1));
 
-      function startAuto() { timer = setInterval(() => go(i + 1), 5000); }
-      function restartAuto() { clearInterval(timer); startAuto(); }
-
-      if (imgs.length) {
-        if (counter) counter.textContent = `${i + 1} / ${imgs.length}`;
-        renderDots();
-        startAuto();
-      }
+      // initialize
+      updateCounter();
     });
   </script>
 </body>
