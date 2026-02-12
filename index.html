@@ -108,7 +108,7 @@
     /* Side */
     .side{ padding:18px; display:grid; gap:14px; align-content:start; }
     h1{ margin:0; font-size:22px; }
-    p{ margin:0; line-height:1.5; color:var(--muted); font-size:14px; }
+    p{ margin:0; line-height:1.5; color:var(--muted); font-size:14px; white-space: pre-wrap; }
 
     .note{
       padding:14px;
@@ -303,7 +303,6 @@
   <div class="wrap" id="wrap">
     <!-- Gallery -->
     <section class="card gallery" aria-label="Photo gallery">
-      <!-- Uses: /images/1.jpg ... /images/10.jpg -->
       <img src="images/1.jpg" class="active" alt="Photo 1">
       <img src="images/2.jpg" alt="Photo 2">
       <img src="images/3.jpg" alt="Photo 3">
@@ -361,178 +360,194 @@
   </div>
 
   <script>
-    // ===== YouTube setup =====
-    // Your link: https://youtu.be/vUFsC-Pl7Js?si=...
-    const YT_VIDEO_ID = "vUFsC-Pl7Js";
+    // Run only after the page is fully loaded
+    window.addEventListener("load", () => {
+      // ===== Curtain =====
+      const curtain = document.getElementById("curtain");
+      const wrap = document.getElementById("wrap");
 
-    let ytPlayer = null;
-    let ytApiReady = false;
-    let shouldAutoPlayOnReady = false;
+      if (!curtain || !wrap) {
+        console.error("Curtain or wrap not found.");
+        return;
+      }
 
-    (function loadYT(){
+      let opened = false;
+
+      function openCurtain() {
+        if (opened) return;
+        opened = true;
+
+        curtain.classList.add("opening");
+        wrap.classList.add("revealed");
+
+        // Start music
+        if (window.ytApiReady && window.ytPlayer && typeof window.ytPlayer.playVideo === "function") {
+          try { window.ytPlayer.unMute(); } catch {}
+          try { window.ytPlayer.playVideo(); } catch {}
+        } else {
+          window.shouldAutoPlayOnReady = true;
+        }
+
+        // Start typing
+        startTyping();
+
+        setTimeout(() => curtain.classList.add("hidden"), 1100);
+      }
+
+      // Make sure it reacts to clicks anywhere on the overlay
+      curtain.addEventListener("click", openCurtain, { passive: true });
+      curtain.addEventListener("pointerdown", openCurtain, { passive: true });
+      curtain.addEventListener("touchstart", openCurtain, { passive: true });
+
+      // Also allow keyboard
+      curtain.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") openCurtain();
+      });
+
+      // ===== YouTube setup =====
+      const YT_VIDEO_ID = "vUFsC-Pl7Js";
+      window.ytPlayer = null;
+      window.ytApiReady = false;
+      window.shouldAutoPlayOnReady = false;
+
+      // Load YT API
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
       document.head.appendChild(tag);
-    })();
 
-    window.onYouTubeIframeAPIReady = function(){
-      ytApiReady = true;
+      window.onYouTubeIframeAPIReady = function () {
+        window.ytApiReady = true;
 
-      ytPlayer = new YT.Player("ytPlayer", {
-        width: "1",
-        height: "1",
-        videoId: YT_VIDEO_ID,
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          disablekb: 1,
-          modestbranding: 1,
-          rel: 0,
-          playsinline: 1
-        },
-        events: {
-          onReady: () => {
-            if (shouldAutoPlayOnReady) {
-              tryPlayYouTube();
-              shouldAutoPlayOnReady = false;
+        window.ytPlayer = new YT.Player("ytPlayer", {
+          width: "1",
+          height: "1",
+          videoId: YT_VIDEO_ID,
+          playerVars: {
+            autoplay: 0,
+            controls: 0,
+            disablekb: 1,
+            modestbranding: 1,
+            rel: 0,
+            playsinline: 1
+          },
+          events: {
+            onReady: () => {
+              if (window.shouldAutoPlayOnReady) {
+                try { window.ytPlayer.unMute(); } catch {}
+                try { window.ytPlayer.playVideo(); } catch {}
+                window.shouldAutoPlayOnReady = false;
+              }
             }
           }
+        });
+      };
+
+      const ytPlay = document.getElementById("ytPlay");
+      const ytPause = document.getElementById("ytPause");
+
+      if (ytPlay) ytPlay.addEventListener("click", () => {
+        if (window.ytPlayer) {
+          try { window.ytPlayer.unMute(); } catch {}
+          try { window.ytPlayer.playVideo(); } catch {}
         }
       });
-    };
 
-    function tryPlayYouTube(){
-      if (!ytPlayer || typeof ytPlayer.playVideo !== "function") return;
-      try { ytPlayer.unMute(); } catch {}
-      try { ytPlayer.playVideo(); } catch {}
-    }
+      if (ytPause) ytPause.addEventListener("click", () => {
+        if (window.ytPlayer) {
+          try { window.ytPlayer.pauseVideo(); } catch {}
+        }
+      });
 
-    document.getElementById("ytPlay").addEventListener("click", () => {
-      if (!ytApiReady) return;
-      tryPlayYouTube();
-    });
-    document.getElementById("ytPause").addEventListener("click", () => {
-      if (ytPlayer && typeof ytPlayer.pauseVideo === "function") ytPlayer.pauseVideo();
-    });
-
-    // ===== Typewriter =====
-    const message =
-      " No gallery of masters, no canvas ever hung,
+      // ===== Typewriter =====
+      const message = `No gallery of masters, no canvas ever hung,
 could hold a light so singular as yours.
-You are no copy, no echo of another’s hand —
+You are no copy, no echo of another’s hand—
 you are the deliberate stroke of God Himself,
 breathed into being with intention,
 sculpted with care so that kindness
 would live forever in the soft chambers of your heart.
-
 Inside and out, you carry His signature:
 that rare warmth that turns strangers into friends,
 that quiet love that makes the air around you feel like home,
 that glow that doesn’t flicker even when the world grows dim.
-You are a daughter of the Most High,
+You are daughter of the Most High,
 light He kindled to walk through shadows,
-a living poem of grace, strength, and gentle joy.
-
-And I…
+a living poem of grace and strength and gentle joy.
+And I—
 I could stand before you for hours,
-not as a critic, not as a passerby,
-but as someone grateful for the privilege of beholding
-the masterpiece He placed directly in my path.
+not as critic, not as passerby,
+but as someone granted the privilege of beholding
+the one masterpiece He placed directly in my path.
 I know now why my eyes keep finding you:
 because heaven, in its quiet wisdom,
-decided I should never stop being astonished by you.
-💛";
+decided I should never stop being astonished.`;
 
-    let typeIndex = 0;
-    let typingStarted = false;
+      let typeIndex = 0;
+      let typingStarted = false;
 
-    function typeWriter(){
-      const el = document.getElementById("typeText");
-      if (!el) return;
+      function typeWriter() {
+        const el = document.getElementById("typeText");
+        if (!el) return;
 
-      if (typeIndex < message.length){
-        el.textContent += message.charAt(typeIndex);
-        typeIndex++;
-        setTimeout(typeWriter, 35);
-      } else {
-        // stop caret blink once finished
-        el.classList.remove("caret");
-      }
-    }
-
-    function startTyping(){
-      if (typingStarted) return;
-      typingStarted = true;
-      setTimeout(typeWriter, 900);
-    }
-
-    // ===== Curtain reveal =====
-    const curtain = document.getElementById("curtain");
-    const wrap = document.getElementById("wrap");
-    let opened = false;
-
-    function openCurtain(){
-      if (opened) return;
-      opened = true;
-
-      curtain.classList.add("opening");
-      wrap.classList.add("revealed");
-
-      // Start song right on reveal
-      if (ytApiReady && ytPlayer) {
-        tryPlayYouTube();
-      } else {
-        shouldAutoPlayOnReady = true;
+        if (typeIndex < message.length) {
+          el.textContent += message.charAt(typeIndex);
+          typeIndex++;
+          setTimeout(typeWriter, 22);
+        } else {
+          el.classList.remove("caret");
+        }
       }
 
-      // Start typing after reveal
-      startTyping();
+      function startTyping() {
+        if (typingStarted) return;
+        typingStarted = true;
+        setTimeout(typeWriter, 800);
+      }
 
-      setTimeout(() => curtain.classList.add("hidden"), 1100);
-    }
+      // ===== Gallery =====
+      const imgs = Array.from(document.querySelectorAll(".gallery img"));
+      const counter = document.getElementById("counter");
+      const dotsWrap = document.getElementById("dots");
 
-    curtain.addEventListener("click", openCurtain);
-    curtain.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") openCurtain();
+      let i = 0;
+      let timer = null;
+
+      function renderDots() {
+        if (!dotsWrap) return;
+        dotsWrap.innerHTML = "";
+        imgs.forEach((_, idx) => {
+          const d = document.createElement("div");
+          d.className = "dot" + (idx === i ? " active" : "");
+          d.style.cursor = "pointer";
+          d.addEventListener("click", () => { go(idx); restartAuto(); });
+          dotsWrap.appendChild(d);
+        });
+      }
+
+      function go(nextIndex) {
+        if (!imgs.length) return;
+        imgs[i].classList.remove("active");
+        i = (nextIndex + imgs.length) % imgs.length;
+        imgs[i].classList.add("active");
+        if (counter) counter.textContent = `${i + 1} / ${imgs.length}`;
+        renderDots();
+      }
+
+      const nextBtn = document.getElementById("next");
+      const prevBtn = document.getElementById("prev");
+
+      if (nextBtn) nextBtn.addEventListener("click", () => { go(i + 1); restartAuto(); });
+      if (prevBtn) prevBtn.addEventListener("click", () => { go(i - 1); restartAuto(); });
+
+      function startAuto() { timer = setInterval(() => go(i + 1), 5000); }
+      function restartAuto() { clearInterval(timer); startAuto(); }
+
+      if (imgs.length) {
+        if (counter) counter.textContent = `${i + 1} / ${imgs.length}`;
+        renderDots();
+        startAuto();
+      }
     });
-
-    // ===== Gallery logic =====
-    const imgs = Array.from(document.querySelectorAll(".gallery img"));
-    const counter = document.getElementById("counter");
-    const dotsWrap = document.getElementById("dots");
-    let i = 0;
-    let timer = null;
-
-    function renderDots(){
-      dotsWrap.innerHTML = "";
-      imgs.forEach((_, idx) => {
-        const d = document.createElement("div");
-        d.className = "dot" + (idx === i ? " active" : "");
-        d.style.cursor = "pointer";
-        d.title = `Go to photo ${idx + 1}`;
-        d.addEventListener("click", () => { go(idx); restartAuto(); });
-        dotsWrap.appendChild(d);
-      });
-    }
-
-    function go(nextIndex){
-      imgs[i].classList.remove("active");
-      i = (nextIndex + imgs.length) % imgs.length;
-      imgs[i].classList.add("active");
-      counter.textContent = `${i + 1} / ${imgs.length}`;
-      renderDots();
-    }
-
-    document.getElementById("next").addEventListener("click", () => { go(i + 1); restartAuto(); });
-    document.getElementById("prev").addEventListener("click", () => { go(i - 1); restartAuto(); });
-
-    function startAuto(){ timer = setInterval(() => go(i + 1), 5000); }
-    function restartAuto(){ clearInterval(timer); startAuto(); }
-
-    counter.textContent = `${i + 1} / ${imgs.length}`;
-    renderDots();
-    startAuto();
   </script>
 </body>
 </html>
-
